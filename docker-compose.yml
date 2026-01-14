@@ -1,0 +1,48 @@
+services:
+  hotel-mysql:
+    image: mysql:latest
+    restart: always
+    container_name: hotel-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hotel_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hotel-network
+
+  hotel-backend:
+    build:
+      context: ./server
+    container_name: hotel-backend
+    environment:
+      MYSQL_HOST: hotel-mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: hotel_db
+      JWT_SECRET: 89749685464894456241849
+    ports:
+      - "8000:8000"
+    depends_on:
+      - hotel-mysql
+    networks:
+      - hotel-network
+
+  hotel-frontend:
+    build:
+      context: ./client
+    container_name: hotel-frontend
+    ports:
+      - "5173:5173"
+    networks:
+      - hotel-network
+
+volumes:
+  mysql_data:
+
+networks:
+  hotel-network:
+    driver: bridge
+
