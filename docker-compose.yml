@@ -2,47 +2,55 @@ services:
   hotel-mysql:
     image: mysql:latest
     restart: always
-    container_name: hotel-mysql
+    container_name: hotelsql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hotel_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB}
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
     ports:
       - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - hotel-network
 
-  hotel-backend:
-    build:
-      context: ./server
+    volumes:
+      - hotel_volume:/var/lib/mysql
+      - ./server/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - hotel-net
+
+  backend:
+    build: ./server
     container_name: hotel-backend
-    environment:
-      MYSQL_HOST: hotel-mysql
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-      MYSQL_DATABASE: hotel_db
-      JWT_SECRET: 89749685464894456241849
     ports:
       - "8000:8000"
-    depends_on:
-      - hotel-mysql
-    networks:
-      - hotel-network
+    environment:
+      MYSQL_HOST: ${DB_HOST}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on: 
+      hotel-mysql:
+        condition: service_healthy
+    networks: 
+     - hotel-net
 
-  hotel-frontend:
-    build:
-      context: ./client
+
+  frontend:
+    build: ./client
     container_name: hotel-frontend
     ports:
       - "5173:5173"
-    networks:
-      - hotel-network
+    networks: 
+     - hotel-net
 
 volumes:
-  mysql_data:
+  hotel_volume:
 
 networks:
-  hotel-network:
+  hotel-net:
     driver: bridge
-
