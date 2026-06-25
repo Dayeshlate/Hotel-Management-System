@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend
+  namespace: hotel-namespace
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+        - name: backend
+          image: dannysdockerhub/hotel-server
+          ports:
+            - containerPort: 3000
+
+          env:
+          - name: MYSQL_HOST
+            valueFrom:
+              secretKeyRef:
+                name: all-secret
+                key: MYSQL_HOST
+
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: all-secret
+                key: MYSQL_USER
+
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: all-secret
+                key: MYSQL_PASSWORD
+
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: MYSQL_DATABASE
+
+          - name: JWT_SECRATE
+            valueFrom:
+              secretKeyRef:
+                name: all-secret
+                key: JWT_SECRATE
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "200m"
+            limits:
+              memory: "256Mi"
+              cpu: "400m"

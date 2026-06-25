@@ -1,0 +1,20 @@
+kind: Pod
+apiVersion: v1
+
+metadata:
+  name: frontend-pod
+  namespace: hotel-namespace
+  labels: 
+    app: frontend
+
+spec:
+  containers:
+    - name: frontend
+      image: dannysdockerhub/hotel-client
+      ports:
+        - containerPort: 5173
+
+
+
+
+

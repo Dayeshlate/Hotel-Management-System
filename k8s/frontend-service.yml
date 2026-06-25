@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+
+metadata:
+  name: frontend-service
+  namespace: hotel-namespace
+
+spec:
+  selector:
+    app: frontend
+
+  ports:
+    - port: 5173
+      targetPort: 5173
+
+  type: NodePort
