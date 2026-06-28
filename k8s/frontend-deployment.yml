@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: dannysdockerhub/hotel-client
+          image: hotel-management-system-frontend:latest   #dannysdockerhub/hotel-client
+          imagePullPolicy: Never
           ports:
             - containerPort: 5173
 

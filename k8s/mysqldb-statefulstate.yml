@@ -1,11 +1,15 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
+
 metadata:
   name: mysql
   namespace: hotel-namespace
 
 spec:
+  serviceName: mysql-service
+
   replicas: 1
+
   selector:
     matchLabels:
       app: mysql
@@ -17,10 +21,12 @@ spec:
 
     spec:
       containers:
-        - name: hotelsql
-          image: mysql:latest
+        - name: mysql
+          image: mysql:8.0
+
           ports:
             - containerPort: 3306
+
           env: 
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -33,11 +39,11 @@ spec:
                 secretKeyRef:
                   name: all-secret
                   key: MYSQL_DATABASE
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
 
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
-            limits:
-              memory: "256Mi"
-              cpu: "500m"
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc

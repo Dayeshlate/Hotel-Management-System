@@ -10,7 +10,8 @@ metadata:
 spec:
   containers:
     - name: backend
-      image: dannysdockerhub/hotel-server
+      image: hotel-management-system-backend:latest   #dannysdockerhub/hotel-server
+      imagePullPolicy: Never
       ports:
         - containerPort: 5000
       env:
